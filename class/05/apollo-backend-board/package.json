@@ -1,0 +1,15 @@
+{
+  "name": "apollo-backend-board",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "apollo-server": "^3.7.0",
+    "graphql": "^16.5.0",
+    "nodemon": "^2.0.16"
+  },
+  "scripts": {
+    "dev": "nodemon index.js"
+  }
+}

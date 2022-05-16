@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>Sample Sign Up Page</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        function bbb() {
+            const phoneNumber = document.getElementById("phoneNo").value;
+            axios.post("http://localhost:8080/tokens/phone", {
+                phone: phoneNumber
+            }).then((res) => {
+                document.getElementById("status").innerText = res.data;
+            })
+        }
+    </script>
+</head>
+<body>
+    휴대폰 번호: <input type="text" id="phoneNo"> <button onclick="bbb()">인증하기</button>
+    <div id="status">인증 미완료</div>
+    <button>회원가입하기</button>
+</body>
+</html>

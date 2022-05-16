@@ -1,4 +1,5 @@
 import coolsms from 'coolsms-node-sdk';
+import 'dotenv/config';
 
 export function checkValidationPhone(myphone){
     if(myphone.length !== 10 && myphone.length !== 11){
@@ -27,12 +28,16 @@ export function getToken(){
 
 //nhn cloud, aws, coolsms
 //API Key (coolsms): NCSKHDKBXQWOQFIP, API Secret Key: QPNOZFGVDVSE25IS3JTZR9RMAERZ6NIP
+//중요한 키 값은 따로 env file로 저장: 모든 파일의 contents 는 String (saved as object, key and value)
 export async function sendTokenToSMS(phoneNo, token){
     const mysms = coolsms.default;
-    const messageService = new mysms('NCSKHDKBXQWOQFIP', 'QPNOZFGVDVSE25IS3JTZR9RMAERZ6NIP');
+    const api_key = process.env.SMS_API_KEY;
+    const api_secretKey = process.env.SMS_API_X_KEY;
+    const senderPhoneNo = process.env.SENDER_NUMBER;
+    const messageService = new mysms(api_key, api_secretKey);
     const result = await messageService.sendOne({
         to: phoneNo,
-        from: '01033006893',
+        from: senderPhoneNo,
         text: `[코드캠프] 인증번호 ${token}를 입력해주세요`
     });
     console.log(result);
