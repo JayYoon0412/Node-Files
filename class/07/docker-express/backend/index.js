@@ -1,4 +1,5 @@
-import {checkValidationPhone, getToken, sendTokenToSMS} from './phone.js';
+import { checkValidationPhone, getToken, sendTokenToSMS } from './phone.js';
+import { checkValidationEmail, getWelcomeTemplate, sendTemplateToEmail } from './email.js'
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
@@ -37,6 +38,17 @@ app.post('/tokens/phone', (req, res) => {
       const mytoken = getToken();
       sendTokenToSMS(req.body.phone, mytoken);
       res.send(`successfully sent ${mytoken}`);
+  }
+})
+
+//메일침프, 노드메일러, NHNCloud, etc...
+app.post('/users', (req, res) => {
+  const user = req.body.user;
+  const isValid = checkValidationEmail(user.email);
+  if (isValid) {
+    const template = getWelcomeTemplate(user);
+    sendTemplateToEmail(user.email, template);
+    res.send("가입완료!")
   }
 })
 
