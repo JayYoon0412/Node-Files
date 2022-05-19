@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./index.js:/myfolder/index.js
+      - ./index.js:/authentication/index.js
     ports:
       - 3000:8080
 
