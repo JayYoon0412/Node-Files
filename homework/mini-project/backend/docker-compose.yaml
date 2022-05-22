@@ -7,6 +7,10 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./index.js:/files/index.js
+      - ./swagger/tokens.swagger.js:/files/swagger/tokens.swagger.js
+      - ./swagger/user.swagger.js:/files/swagger/user.swagger.js
+      - ./swagger/users.swagger.js:/files/swagger/users.swagger.js
+      - ./swagger/starbucks.swagger.js:/files/swagger/starbucks.swagger.js
     ports:
       - 3000:8080
 

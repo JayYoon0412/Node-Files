@@ -10,7 +10,6 @@ const getValidationNumber = async () => {
 
 // 핸드폰 인증 완료 API 요청
 const submitToken = async () => {
-  console.log("clicked!")
   const phoneNumber = document.getElementById("PhoneNumber01").value+document.getElementById("PhoneNumber02").value+document.getElementById("PhoneNumber03").value
   const tokenIn = document.getElementById("TokenInput").value
   console.log(tokenIn)

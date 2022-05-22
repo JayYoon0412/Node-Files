@@ -8,7 +8,6 @@ const getUser = async () => {
       createUserDiv(res.data[i])
     }
   })
-  createUserDiv()
 }
 
 const createUserDiv = (data) => {

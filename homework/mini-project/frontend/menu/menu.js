@@ -8,7 +8,6 @@ const getCoffee = async () => {
       createMenuCard(res.data[i])
     }
   })
-  createMenuCard()
 }
 
 const createMenuCard = (data) => {

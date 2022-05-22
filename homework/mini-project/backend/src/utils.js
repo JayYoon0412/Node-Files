@@ -7,5 +7,5 @@ export function getCreatedAt() {
 }
 
 export function securePersonal(str) {
-    return str + "-*******"
+    return str.substring(0, 7) + "-*******"
 }
