@@ -1,0 +1,33 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Starbucks {
+  name: String!
+  price: Int!
+  kcal: Int!
+  saturatedFat: Int!
+  protein: Int!
+  sodium: Int!
+  carb: Int!
+  caffeine: Int!
+}
+
+type Query {
+  fetchStarbucks: [Starbucks!]!
+}
+
+type Mutation {
+  createStarbucks(createStarbucksInput: CreateStarbucksInput!): String!
+}
+
+input CreateStarbucksInput {
+  name: String!
+  price: Int!
+  kcal: Int!
+  saturatedFat: Int!
+  protein: Int!
+  sodium: Int!
+  carb: Int!
+  caffeine: Int!
+}

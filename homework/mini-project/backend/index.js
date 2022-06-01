@@ -79,7 +79,7 @@ app.post('/tokens/phone', async (req, res) => {
 
 app.patch('/tokens/phone', async (req, res) => {
     const dataTarget = await Token.findOne({ phone: req.body.phone }).exec()
-    if (dataTarget===null || dataTarget.token != req.body.token) res.send(false)
+    if (dataTarget===null || dataTarget.token !== req.body.token) res.send(false)
     else if (dataTarget.token === req.body.token) {
         await Token.updateOne({ phone: req.body.phone }, { isAuth: true })
         res.send(true)

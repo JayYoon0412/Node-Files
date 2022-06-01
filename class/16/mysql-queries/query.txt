@@ -1,0 +1,26 @@
+show databases;
+use mylocaltest;
+show tables;
+desc product;
+select * from product;
+insert into product (id, name, description, price, isSoldout)
+values(uuid(), "trackpad", "it's a really nice trackpad", 30, false);
+INSERT into product (id, name, description, price, isSoldout)
+values (uuid(), "macbook pro", "it's new", 100, true);
+SELECT * from product;
+SELECT name, price from product;
+SELECT * from product_saleslocation;
+INSERT into product_saleslocation (id, address, addressDetail, lat, lng, meetingTime)
+values (uuid(), "구로구", "구로구 디지털단지역", "109094", "190939", "2022-05-20");
+SELECT * from product_saleslocation ps ;
+SELECT * from product p ;
+UPDATE product set locationId = "aa9884ba-dff5-11ec-9348-aa1672f67e93" where name = 'macbook pro';
+SELECT * from product p ;
+SELECT name, price, address, addressDetail from product, product_saleslocation WHERE 
+product.locationId = product_saleslocation.id ;
+
+//as, and, or 모두 사용 가능 키워드
+//집계 키워드: SUM, MAX도 사용 가능 (ex. select name, SUM(price) from product group by name)
+//여기서 group by는 name 기준으로 합쳐짐.
+//정렬: order by desc(or asc)
+//subqueries also possible
