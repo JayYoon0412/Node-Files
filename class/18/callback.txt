@@ -1,0 +1,13 @@
+Callback Functions: 인자로 들어가는 함수
+
+목적 1. 대상 함수에서 실행시키고 싶은 로직 (함수)를 직접 작성해서 보낼 수 있다.
+목적 2. 대상 함수로부터 받아온 인자를 처리할 수 있다.
+
+예_[철수, 영희, 훈이].map((element)=>element+"어린이");
+-> map 안에서 다른 함수를 실행하고 있음. 약간 헬퍼 느낌이 난다.
+또, 대표적으로 setInterval 함수가 있다.
+
+c.f. XMLHttpRequest
+
+
+Promise Chaining은 리턴 타입이 Promise 여야만 이어서 가능

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introducing CallBacks</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+    //API 3개를 연속으로 실행할 것이다. 각각의 API는 순서가 존재한다. Dependency Exists.
+    //순서: 임의 숫자 가져오기 API, 해당번호의 게시글 조회, 해당 글 작성자의 다른 게시글 불러오기
+    //CallBack Hell -> 보기도 어렵고 유지보수도 어렵다.
+        function myCallback() {
+            const req = new XMLHttpRequest();
+            req.open("get", "http://numbersapi.com/random?min=1&max=200");
+            req.send();
+            //load가 완료되면 trigger specified function
+            //load 완료된 결과물은 callback의 인자로 받음
+            req.addEventListener("load", (res)=>{
+                console.log(res);
+                const num = res.target.response.split(" ")[0];
+                const reqBoard = new XMLHttpRequest();
+                reqBoard.open("get", `http://koreanjson.com/posts/${num}`);
+                reqBoard.send();
+                reqBoard.addEventListener("load", (res)=> {
+                    console.log(res);
+                    const writer = JSON.parse(res.target.response).UserId;
+                    const reqMore = new XMLHttpRequest();
+                    reqMore.open("get", `http://koreanjson.com/posts?userId=${writer}`);
+                    reqMore.send();
+                    reqMore.addEventListener("load", ()=>"실행이 모두 완료되었습니다.")
+                })
+            }) 
+        }
+    //콜백 지옥을 개선하고자 Promise 나옴 **직관적이지 않다! 실행 순서 참고!!!
+    //차이점: Promise Chaining -> then들을 하나로 통합할 수 있다 -> 대신 return 사용!
+    //아무때나 .then을 붙일 수 있는게 아니다. return 되는 결과가 Promise 여야 가능하다 (리턴 타입 중 하나, 시간이 걸린다는 뜻)
+        function myPromise() {
+            //1번째 실행
+            axios.get("http://numbersapi.com/random?min=1&max=200").then((res)=>{
+                //3번째 실행
+                const num = res.data.split(" ")[0];
+                return axios.get(`http://koreanjson.com/posts/${num}`)
+            })
+            .then((res)=>{
+                //4번째 실행
+                const writer = res.data.UserId;
+                return axios.get(`http://koreanjson.com/posts?userId=${writer}`)
+            })
+            .then((res)=>{
+                //5번째 실행
+                console.log("드디어 완료되었는데, 너무 가독성도 떨어지고 힘들다. 또 다시 콜백지옥...")
+            })
+            //2번째 실행
+        }
+    //이제야 나온 AsyncAwait. 콜백 지옥을 제발 없애줘 -> 더 직관적이다.
+    //Await는 .then을 대신 한다고 볼 수 있다. Await는 ***Promise 일때 기다려서 결과를 가져올 수 있다.
+    //Promise와 차이점: 실행 순서가 더 직관적이다. 정말 순서대로 실행.
+        async function myAsyncAwait() {
+            const res1 = await axios.get();
+            const num = res1.data.split(" ")[0];
+
+            const res2 = await axios.get();
+            const writer = res2.data.UserId;
+
+            const res3 = await axios.get();
+            console.log(res3.data);
+        }
+    //Promise는 new Promise로 오래걸리는 작업을 직접 만들 수 있음. Promise and resolve (결과 돌려줌)
+    </script>
+</head>
+
+<body>
+   <button onclick="myCallback()">CallBack</button>
+   <button onclick="myPromise()">Promise</button>
+   <button onclick="myAsyncAwait()">AsyncAwait</button>
+</body>
+</html>
