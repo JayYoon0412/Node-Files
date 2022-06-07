@@ -1,0 +1,69 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Payment {
+  id: String!
+  payDate: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type User {
+  id: String!
+  name: String!
+}
+
+type Product {
+  id: String!
+  name: String!
+  description: String!
+  cost: Int!
+  uploadDate: DateTime!
+  user: User
+  withDeleted: DateTime
+  payment: Payment
+}
+
+type Query {
+  fetchProductsWithDeleted: [Product!]!
+  fetchProduct(productId: String!): Product!
+  fetchProducts: [Product!]!
+}
+
+type Mutation {
+  createProduct(createProductInput: CreateProductInput!): Product!
+  updateProduct(productId: String!, updateProductInput: UpdateProductInput!): Product!
+  deleteProduct(productId: String!): Boolean!
+  restoreProduct(productId: String!): Boolean!
+  createPayment(payDate: DateTime!): Payment!
+}
+
+input CreateProductInput {
+  name: String!
+  description: String!
+  cost: Int!
+  uploadDate: DateTime
+  user: UserInput!
+  payment: PaymentInput!
+}
+
+input UserInput {
+  name: String!
+}
+
+input PaymentInput {
+  payDate: DateTime!
+}
+
+input UpdateProductInput {
+  name: String
+  description: String
+  cost: Int
+  uploadDate: DateTime
+  user: UserInput
+  payment: PaymentInput
+}

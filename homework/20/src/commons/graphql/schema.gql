@@ -1,0 +1,106 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Payment {
+  id: String!
+  payDate: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type UserArea {
+  id: String!
+  name: String!
+  users: [User!]!
+}
+
+type UserTemp {
+  id: String!
+  temp: String!
+}
+
+type User {
+  id: String!
+  userNumber: String!
+  name: String!
+  withDeleted: DateTime!
+  temperature: UserTemp!
+  areas: [UserArea!]!
+}
+
+type Product {
+  id: String!
+  name: String!
+  description: String!
+  cost: Int!
+  uploadDate: DateTime!
+  user: User
+  withDeleted: DateTime
+  payment: Payment
+  categories: [Category!]!
+}
+
+type Category {
+  id: String!
+  name: String!
+  products: [Product!]!
+}
+
+type Query {
+  fetchUsers: [User!]!
+  fetchProductsWithDeleted: [Product!]!
+  fetchProduct(productId: String!): Product!
+  fetchProducts: [Product!]!
+}
+
+type Mutation {
+  createUser(userInput: UserInput!): User!
+  deleteUser(userId: String!): Boolean!
+  updateUser(userId: String!, updateUserInput: UpdateUserInput!): User!
+  createUserTemp(temp: String!): UserTemp!
+  createCategory(name: String!): Category!
+  createProduct(createProductInput: CreateProductInput!): Product!
+  updateProduct(productId: String!, updateProductInput: UpdateProductInput!): Product!
+  deleteProduct(productId: String!): Boolean!
+  restoreProduct(productId: String!): Boolean!
+  createPayment(payDate: DateTime!): Payment!
+}
+
+input UserInput {
+  userNumber: String!
+  name: String!
+  temperatureId: String!
+  areasId: [String!]!
+}
+
+input UpdateUserInput {
+  name: String!
+}
+
+input CreateProductInput {
+  name: String!
+  description: String!
+  cost: Int!
+  uploadDate: DateTime
+  user: UserInput!
+  payment: PaymentInput!
+  categories: [String!]!
+}
+
+input PaymentInput {
+  payDate: DateTime!
+}
+
+input UpdateProductInput {
+  name: String
+  description: String
+  cost: Int
+  uploadDate: DateTime
+  user: UserInput
+  payment: PaymentInput
+  categories: [String!]
+}
