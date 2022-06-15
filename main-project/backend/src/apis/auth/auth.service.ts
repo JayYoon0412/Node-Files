@@ -29,7 +29,6 @@ export class AuthService {
     let userFound = await this.userService.findUser({
       userNumber: req.user.userNumber,
     });
-    console.log(`환영합니다 ${userFound.name}님!`);
     if (!userFound) {
       userFound = await this.userService.create({
         userInput: {

@@ -8,9 +8,14 @@ import { CategoryModule } from './apis/category/category.module';
 import { UserTempModule } from './apis/userTemp/userTemp.module';
 import { UserModule } from './apis/users/user.module';
 import { AuthModule } from './apis/auth/auth.module';
+import { FileModule } from './apis/file/file.module';
+import { ImageModule } from './apis/image/image.module';
 
 @Module({
   imports: [
+    ImageModule,
+    FileModule,
+    PaymentModule,
     AuthModule,
     UserModule,
     UserTempModule,
@@ -28,7 +33,7 @@ import { AuthModule } from './apis/auth/auth.module';
       port: 3306,
       username: 'root',
       password: 'jiwon2002',
-      database: 'day19',
+      database: 'main_project03',
       entities: [__dirname + '/apis/**/*.entity.*'],
       synchronize: true,
       logging: true,

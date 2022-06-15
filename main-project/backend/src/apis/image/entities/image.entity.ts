@@ -1,5 +1,12 @@
 import { Product } from '../../product/entities/product.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  JoinTable,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @Entity()
@@ -13,7 +20,16 @@ export class Image {
   @Field(() => String)
   src: string;
 
-  @ManyToOne(() => Product)
+  @Column()
+  @Field(() => Date)
+  uploadedAt: Date;
+
+  @DeleteDateColumn()
+  @Field(() => Date, { defaultValue: null, nullable: true })
+  withDeleted: Date;
+
+  @JoinTable()
+  @ManyToOne(() => Product, (product) => product.images)
   @Field(() => Product)
   product: Product;
 }

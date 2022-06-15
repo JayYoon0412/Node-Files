@@ -1,9 +1,4 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
-import { PaymentInput } from 'src/apis/payment/dto/payment.input';
-import { Payment } from 'src/apis/payment/entities/payment.entity';
-import { UserInput } from 'src/apis/users/dto/user.input';
-import { User } from 'src/apis/users/entities/user.entity';
-import { Product } from '../entities/product.entity';
 
 @InputType()
 export class CreateProductInput {
@@ -19,12 +14,12 @@ export class CreateProductInput {
   @Field(() => Date, { nullable: true })
   uploadDate: Date;
 
-  @Field(() => UserInput)
-  user: UserInput;
+  @Field(() => String, { nullable: true })
+  userId: string;
 
-  @Field(() => PaymentInput)
-  payment: PaymentInput;
-
-  @Field(() => [String])
+  @Field(() => [String], { nullable: true })
   categories: string[];
+
+  @Field(() => [String], { nullable: true })
+  images: string[];
 }

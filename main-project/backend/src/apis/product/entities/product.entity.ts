@@ -9,10 +9,12 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Image } from 'src/apis/image/entities/image.entity';
 
 @Entity()
 @ObjectType()
@@ -45,13 +47,20 @@ export class Product {
   @Field(() => Date, { defaultValue: null, nullable: true })
   withDeleted: Date;
 
+  @Field(() => Boolean, { nullable: true, defaultValue: false })
+  isSoldOut: boolean;
+
   @JoinColumn()
   @OneToOne(() => Payment)
-  @Field(() => Payment, { nullable: true })
+  @Field(() => Payment, { nullable: true, defaultValue: null })
   payment: Payment;
 
   @JoinTable()
   @ManyToMany(() => Category, (categories) => categories.products)
-  @Field(() => [Category])
+  @Field(() => [Category], { nullable: true })
   categories: Category[];
+
+  @OneToMany(() => Image, (images) => images.product)
+  @Field(() => [Image], { nullable: true })
+  images: Image[];
 }

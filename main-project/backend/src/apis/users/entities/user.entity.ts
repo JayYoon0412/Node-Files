@@ -9,7 +9,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @Entity()
 @ObjectType()
@@ -19,7 +19,7 @@ export class User {
   id: string;
 
   @Column()
-  @Field(()=>String)
+  @Field(() => String)
   userNumber: string;
 
   @Column()
@@ -31,7 +31,7 @@ export class User {
   name: string;
 
   @DeleteDateColumn()
-  @Field(()=>Date)
+  @Field(() => Date)
   withDeleted: Date;
 
   @ManyToOne(() => UserTemp)
@@ -42,4 +42,8 @@ export class User {
   @ManyToMany(() => UserArea, (areas) => areas.users)
   @Field(() => [UserArea])
   areas: UserArea[];
+
+  @Column({ default: 0 })
+  @Field(() => Int)
+  point: number;
 }

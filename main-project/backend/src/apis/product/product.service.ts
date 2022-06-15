@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Category } from '../category/entities/category.entity';
+import { Image } from '../image/entities/image.entity';
+import { ImageService } from '../image/image.service';
 import { Payment } from '../payment/entities/payment.entity';
 import { User } from '../users/entities/user.entity';
 import { Product } from './entities/product.entity';
@@ -17,37 +19,61 @@ export class ProductService {
     private readonly paymentRepository: Repository<Payment>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Image)
+    private readonly imageRepository: Repository<Image>,
+    private readonly imageService: ImageService,
   ) {}
 
   async create({ createProductInput }) {
-    const { user, categories, ...product } = createProductInput;
-    const userInfo = await this.userRepository.save({
-      ...user,
+    const { userId, categories, images, name, ...product } = createProductInput;
+    const userInfo = await this.userRepository.findOne({
+      where: { id: userId },
     });
-    const paymentInfo = await this.paymentRepository.save({
-      payDate: new Date(),
-    });
-    const resultCategories = [];
-    for (let i = 0; i < categories.length; i++) {
-      const newCategory = await this.categoryRepository.save({
-        name: categories[i],
-      });
-      resultCategories.push(newCategory);
-    }
-    
-    const newProduct = await this.productRepository.save({
+
+    const categoryList = await Promise.all(
+      categories.map((element) => {
+        return this.categoryRepository.findOne({ where: { id: element } });
+      }),
+    );
+
+    const imgList = await Promise.all(
+      images.map((element) => {
+        return this.imageRepository.findOne({ where: { src: element } });
+      }),
+    );
+
+    const newProduct = this.productRepository.save({
       ...product,
+      name,
+      uploadDate: new Date(),
       user: userInfo,
-      payment: paymentInfo,
-      categories: resultCategories,
+      categories: categoryList,
+      images: imgList,
     });
+
     return newProduct;
   }
 
   async update({ productId, updateProductInput }) {
+    const { images, ...updatedInfo } = updateProductInput;
+    const imagesFound = await this.imageRepository.find({
+      where: { product: productId },
+    });
+    console.log(imagesFound);
+    await Promise.all(
+      imagesFound.map((element) => {
+        return this.imageService.delete({ imageId: element.id });
+      }),
+    );
+    const newImgList = await Promise.all(
+      images.map((element) => {
+        return this.imageRepository.findOne({ where: { src: element } });
+      }),
+    );
     const result = await this.productRepository.save({
-      ...updateProductInput,
+      ...updatedInfo,
       id: productId,
+      images: newImgList,
     });
     return result;
   }
@@ -86,9 +112,4 @@ export class ProductService {
     });
     return product;
   }
-
-  // async checkPayment({ productId }) {
-  //   const product = await this.productRepository.findOne({ id: productId });
-  //   return product.cost < 0;
-  // }
 }

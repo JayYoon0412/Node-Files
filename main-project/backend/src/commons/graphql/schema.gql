@@ -2,16 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Payment {
-  id: String!
-  payDate: DateTime!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 type UserArea {
   id: String!
   name: String!
@@ -30,6 +20,34 @@ type User {
   withDeleted: DateTime!
   temperature: UserTemp!
   areas: [UserArea!]!
+  point: Int!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Payment {
+  id: String!
+  impUid: String!
+  status: PAYMENT_STATUS!
+  payDate: DateTime!
+  payPrice: Int!
+  buyer: User!
+}
+
+enum PAYMENT_STATUS {
+  PAYMENT
+  CANCELLATION
+}
+
+type Image {
+  id: String!
+  src: String!
+  uploadedAt: DateTime!
+  withDeleted: DateTime
+  product: Product!
 }
 
 type Product {
@@ -40,8 +58,10 @@ type Product {
   uploadDate: DateTime!
   user: User
   withDeleted: DateTime
+  isSoldOut: Boolean
   payment: Payment
-  categories: [Category!]!
+  categories: [Category!]
+  images: [Image!]
 }
 
 type Category {
@@ -59,6 +79,11 @@ type Query {
 }
 
 type Mutation {
+  createImage(src: String!): Image!
+  deleteImage(imageId: String!): Boolean!
+  uploadFile(files: [Upload!]!): [String!]!
+  createPayment(impUid: String!, payPrice: Float!): Payment!
+  cancelPayment(impUid: String!): Payment!
   login(userNumber: String!, password: String!): String!
   restoreAccessToken: String!
   createUser(userInput: UserInput!): User!
@@ -72,8 +97,10 @@ type Mutation {
   updateProduct(productId: String!, updateProductInput: UpdateProductInput!): Product!
   deleteProduct(productId: String!): Boolean!
   restoreProduct(productId: String!): Boolean!
-  createPayment(payDate: DateTime!): Payment!
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 input UserInput {
   userNumber: String!
@@ -92,13 +119,9 @@ input CreateProductInput {
   description: String!
   cost: Int!
   uploadDate: DateTime
-  user: UserInput!
-  payment: PaymentInput!
-  categories: [String!]!
-}
-
-input PaymentInput {
-  payDate: DateTime!
+  userId: String
+  categories: [String!]
+  images: [String!]
 }
 
 input UpdateProductInput {
@@ -106,7 +129,7 @@ input UpdateProductInput {
   description: String
   cost: Int
   uploadDate: DateTime
-  user: UserInput
-  payment: PaymentInput
+  userId: String
   categories: [String!]
+  images: [String!]
 }
