@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { IamportService } from '../iamport/iamport.service';
+import { Product } from '../product/entities/product.entity';
 import { User } from '../users/entities/user.entity';
 import { Payment, PAYMENT_STATUS } from './entities/payment.entity';
 
@@ -17,86 +18,98 @@ export class PaymentService {
     private readonly paymentRepository: Repository<Payment>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
     private readonly iamportService: IamportService,
-    private readonly connection: Connection
+    private readonly connection: Connection,
   ) {}
 
-  async create({ impUid, payPrice, targetUser }) {
+  async create({ impUid, productId, targetUser }) {
     const access_token = await this.iamportService.getToken();
     const paymentData = await this.iamportService.getPaymentData({
       access_token,
       impUid,
     });
-    await this.checkAmount({ paymentData, payPrice });
+    const productFound = await this.productRepository.findOne({
+      id: productId,
+    });
+    await this.checkAmount({ paymentData, payPrice: productFound.cost });
     await this.checkDuplicate({ impUid });
 
     const queryRunner = await this.connection.createQueryRunner();
     await queryRunner.connect();
-    await queryRunner.startTransaction("SERIALIZABLE");
+    await queryRunner.startTransaction('SERIALIZABLE');
 
     try {
       const transaction = this.paymentRepository.create({
         impUid,
         status: PAYMENT_STATUS.PAYMENT,
-        payPrice,
+        payPrice: productFound.cost,
         buyer: targetUser,
       });
       await queryRunner.manager.save(transaction);
-  
-      const buyerUser = await queryRunner.manager.findOne(
-        User, {userNumber: targetUser.userNumber}, {lock: {mode: "pessimistic_write"}
+
+      const productSold = await queryRunner.manager.findOne(
+        Product,
+        { id: productId },
+        { lock: { mode: 'pessimistic_write' } },
+      );
+      const updatedProduct = await this.productRepository.create({
+        ...productSold,
+        isSoldOut: true,
+        payment: transaction,
       });
-      const updatedUser = await this.userRepository.create({
-        ...buyerUser, point: buyerUser.point + payPrice
-      });
-      await queryRunner.manager.save(updatedUser);
+      await queryRunner.manager.save(updatedProduct);
       await queryRunner.commitTransaction();
       return transaction;
-    } catch(error) {
+    } catch (error) {
       await queryRunner.rollbackTransaction();
     } finally {
       await queryRunner.release();
     }
-    
   }
 
-  async cancel({ impUid, targetUser }) {
+  async cancel({ impUid, productId, targetUser }) {
     const foundPayment = await this.paymentRepository.find({ impUid });
     if (foundPayment.length > 1)
       throw new UnprocessableEntityException(
         'ERROR 422: 이미 환불이 완료되었습니다.',
       );
-    const payHistory = await this.paymentRepository.findOne({
-      where: { impUid, status: 'PAYMENT' },
+    const productFound = await this.productRepository.findOne({
+      where: { id: productId },
     });
 
     const access_token = await this.iamportService.getToken();
     const cancel_request_data = await this.iamportService.requestCancel({
       access_token,
       impUid,
-      payPrice: payHistory.payPrice,
+      payPrice: productFound.cost,
     });
     console.log(cancel_request_data);
     const queryRunner = await this.connection.createQueryRunner();
     await queryRunner.connect();
-    await queryRunner.startTransaction("SERIALIZABLE");
+    await queryRunner.startTransaction('SERIALIZABLE');
 
     try {
       const cancelTransaction = this.paymentRepository.create({
         impUid,
         status: PAYMENT_STATUS.CANCELLATION,
-        payPrice: payHistory.payPrice,
+        payPrice: productFound.cost,
         buyer: targetUser,
       });
       await queryRunner.manager.save(cancelTransaction);
-  
-      const canceller = await queryRunner.manager.findOne(
-        User, {userNumber: targetUser.userNumber}, {lock: {mode: "pessimistic_write"}}
+
+      const productSold = await queryRunner.manager.findOne(
+        Product,
+        { id: productId },
+        { lock: { mode: 'pessimistic_write' } },
       );
-      const updatedUser = await this.userRepository.create({
-        ...canceller, point: canceller.point + payHistory.payPrice
-      })
-      await queryRunner.manager.save(updatedUser);
+      const updatedProduct = await this.productRepository.create({
+        ...productSold,
+        isSoldOut: false,
+        payment: null,
+      });
+      await queryRunner.manager.save(updatedProduct);
       await queryRunner.commitTransaction();
       return cancelTransaction;
     } catch (error) {

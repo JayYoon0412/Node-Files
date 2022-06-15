@@ -33,7 +33,7 @@ import { ImageModule } from './apis/image/image.module';
       port: 3306,
       username: 'root',
       password: 'jiwon2002',
-      database: 'main_project03',
+      database: 'main_project',
       entities: [__dirname + '/apis/**/*.entity.*'],
       synchronize: true,
       logging: true,

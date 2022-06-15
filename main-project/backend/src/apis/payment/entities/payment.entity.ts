@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Product } from 'src/apis/product/entities/product.entity';
 
 export enum PAYMENT_STATUS {
   PAYMENT = 'PAYMENT',

@@ -46,6 +46,7 @@ export class ProductService {
       ...product,
       name,
       uploadDate: new Date(),
+      isSoldOut: false,
       user: userInfo,
       categories: categoryList,
       images: imgList,

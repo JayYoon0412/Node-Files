@@ -47,6 +47,7 @@ export class Product {
   @Field(() => Date, { defaultValue: null, nullable: true })
   withDeleted: Date;
 
+  @Column()
   @Field(() => Boolean, { nullable: true, defaultValue: false })
   isSoldOut: boolean;
 

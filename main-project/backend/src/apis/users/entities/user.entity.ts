@@ -42,8 +42,4 @@ export class User {
   @ManyToMany(() => UserArea, (areas) => areas.users)
   @Field(() => [UserArea])
   areas: UserArea[];
-
-  @Column({ default: 0 })
-  @Field(() => Int)
-  point: number;
 }

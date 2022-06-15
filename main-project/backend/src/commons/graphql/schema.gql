@@ -20,7 +20,6 @@ type User {
   withDeleted: DateTime!
   temperature: UserTemp!
   areas: [UserArea!]!
-  point: Int!
 }
 
 """
@@ -82,8 +81,8 @@ type Mutation {
   createImage(src: String!): Image!
   deleteImage(imageId: String!): Boolean!
   uploadFile(files: [Upload!]!): [String!]!
-  createPayment(impUid: String!, payPrice: Float!): Payment!
-  cancelPayment(impUid: String!): Payment!
+  createPayment(impUid: String!, productId: String!): Payment!
+  cancelPayment(impUid: String!, productId: String!): Payment!
   login(userNumber: String!, password: String!): String!
   restoreAccessToken: String!
   createUser(userInput: UserInput!): User!

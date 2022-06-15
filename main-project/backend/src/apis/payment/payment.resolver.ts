@@ -13,18 +13,19 @@ export class PaymentResolver {
   @Mutation(() => Payment)
   createPayment(
     @Args('impUid') impUid: string,
-    @Args('payPrice') payPrice: number,
+    @Args('productId') productId: string,
     @TargetUser('targetUser') targetUser: ITargetUser,
   ) {
-    return this.paymentService.create({ impUid, payPrice, targetUser });
+    return this.paymentService.create({ impUid, productId, targetUser });
   }
 
   @UseGuards(GqlAccessGuard)
   @Mutation(() => Payment)
   cancelPayment(
     @Args('impUid') impUid: string,
+    @Args('productId') productId: string,
     @TargetUser('targetUser') targetUser: ITargetUser,
   ) {
-    return this.paymentService.cancel({ impUid, targetUser });
+    return this.paymentService.cancel({ impUid, productId, targetUser });
   }
 }
