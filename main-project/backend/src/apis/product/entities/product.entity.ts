@@ -12,6 +12,7 @@ import {
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Image } from 'src/apis/image/entities/image.entity';
@@ -38,6 +39,9 @@ export class Product {
   @Column({ nullable: true })
   @Field(() => Date)
   uploadDate: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @ManyToOne(() => User)
   @Field(() => User, { nullable: true })

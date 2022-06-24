@@ -1,0 +1,82 @@
+> mySQL shell procedure 생성 및 제거, 실행
+
+show databases;
+use mylocaltest;
+select * from board b;
+drop procedure mydummydatacreate; //procedure 삭제하기
+show procedure status;
+create procedure mydummydata()
+begin
+	declare i int default 1;
+	while i <= 5000 do
+		insert into board(writer, title, contents) values('철수', rand(), '빈내용입니다');
+		set i = i + 1;
+	end while;
+end;
+
+call mydummydata();
+
+> 인덱스 INDEX SEARCH
+//DB optimizer, 실행계획, explain keyword
+explain 
+    select *
+      from board
+    where number = 36;
+
+type const 자동생성/ref 커스텀/range 특정 범위에서 -> 인덱스 찾아볼 예정 (책갈피 개념) vs. type ALL (인덱스 아니라 모두 다 볼 예정)
+시간 차이가 많이 남: PK, FK, UNIQUE는 자동으로 인덱스 (책갈피) 생성됨. 인덱스가 걸려있는 컬럼으로 찾으면 훨씬 빨리 찾는다.
+
+//인덱스 확인
+show index from board;
+
+커스텀 컬럼 (그 외) 인덱스 만들기: title에 idx_title이라는 인덱스 생성해주기
+create index idx_title on board(title)
+
+TradeOff: 하지만 index가 너무 많아지면 조회는 빨라지지만 등록과 수정이 느려짐 
+
+# 데이터 전체 갯수 확인
+select COUNT(*) from board
+;
+
+# 쿼리 검색 속도 비교
+select *
+  from board
+ where title = '0.05627863393749914'
+;
+select *
+  from board
+ where number = 36
+;
+
+# 옵티마이저 실행계획 확인
+explain
+ select *
+   from board
+  where title = '0.05627863393749914'
+;
+explain
+ select *
+   from board
+  where number = 36
+;
+
+# 인덱스 확인
+show index from board
+;
+
+# 인덱스 생성
+create index idx_title on board(title)
+;
+
+# 옵티마이저 실행계획 확인
+explain
+ select *
+   from board
+  where title = '0.05627863393749914'
+;
+
+# 인덱싱된 컬럼으로 재쿼리 후, 성능 비교
+select *
+  from board
+ where title = '0.05627863393749914'
+;

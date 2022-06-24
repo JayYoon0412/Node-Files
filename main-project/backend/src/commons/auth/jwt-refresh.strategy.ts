@@ -1,11 +1,16 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER, Inject, UnauthorizedException } from '@nestjs/common';
 
 export class JwtRefreshStrategy extends PassportStrategy(
   Strategy,
   'refreshGuard',
 ) {
-  constructor() {
+  constructor(
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache
+  ) {
     super({
       jwtFromRequest: (req) => {
         const cookie = req.headers.cookie;
@@ -13,10 +18,14 @@ export class JwtRefreshStrategy extends PassportStrategy(
         return refreshToken;
       },
       secretOrKey: 'refreshKey',
+      passReqToCallback: true
     });
   }
 
-  async validate(payload: any) {
+  async validate(req: any, payload: any) {
+    let refreshToken = req.headers.cookie.replace("refreshToken=", "");
+    let tokenFound = await this.cacheManager.get(`refreshToken:${refreshToken}`)
+    if (tokenFound) throw new UnauthorizedException("로그아웃된 유저입니다. 다시 로그인해주세요.")
     return {
       userNumber: payload.userNumber,
       id: payload.sub,

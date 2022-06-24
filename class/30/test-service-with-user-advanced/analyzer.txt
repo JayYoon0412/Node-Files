@@ -1,0 +1,42 @@
+애널라이져 -> 캐릭터 필터, 토큰나이저, 토큰 필터
+
+standard ANALYZER default: 특수문자 제거/ 공백 나눔/ 소문자로 통일화
+whitespace analyzer: only whitespace tokenizer present, 공백 기준으로만 나눈다 (세 개 필수는 아니다)
+keyword analyzer: 한 단어로 나눈다 (토큰이 전체로 쪼개짐. 띄어쓰기 포함 전체를 모두 입력해야 검색된다)
+snowball analyzer: 시제 접미사 제거 후 검색 토큰 생성
+
+{
+	"analyzer": "snowball",
+	"text": "안녕하세요. Bestshop입니다! Best going 상품만 취급합니다"
+}
+굳이 애널라이저 쓸 필요없이 토큰나이저만 써도 된다.
+{
+	"tokenizer": "standard",
+	"text": "안녕하세요. Bestshop입니다! Best going 상품만 취급합니다"
+}
+
+SETTINGS and MAPPINGS
+settings: 사용하고 싶은 analyzer, tokenizer, token filter 미리 등록
+mappings: 어떤 column 어떤 analyzer 사용해서 분석할 것인지 (토큰 생성해야 될지) 미리 등록
+*mapping은 나중에 바꿀 수 없다. 데이터가 들어오기 전에 먼저 등록해놓아야된다.
+
+{
+	"settings": {
+		"analysis": {
+			"analyzer": {
+				"ngram_analyzer": {
+					"type": "custom",
+					 "tokenizer": "ngram_tokenizer"
+				}
+			},
+			"tokenizer": {
+				"ngram_tokenizer": {
+					"type": "nGram",
+					"min_gram": "1",
+					"max_gram": "10"
+				}
+			}
+		},
+		"max_ngram_diff": "10"
+	}
+}

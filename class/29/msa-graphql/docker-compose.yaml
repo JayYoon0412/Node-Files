@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+      #해당 Dockerfile 경로, 본 파일 기준
+      dockerfile: Dockerfile
+    volumes:
+      - ./api-gateway/src:/api-gateway/src
+    ports:
+      - 3000:3000
+      #다른 도커는 같은 도커-컴포즈로 name resolution 접속 가능.
+      #그러므로 따로 port-forwarding 필요없음.
+
+
+  auth-service:
+    build:
+      context: ./services/auth
+      dockerfile: Dockerfile
+    volumes:
+      - ./services/auth/src:/auth-service/src
+      #Docker에서는 Dockerfile에서 auth-service폴더로 만들어줌.
+
+  resource-service:
+    build:
+      context: ./services/resource
+      dockerfile: Dockerfile
+    volumes:
+      - ./services/resource/src:/resource-service/src
+    

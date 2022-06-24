@@ -74,7 +74,7 @@ type Query {
   fetchLoginUser: User!
   fetchProductsWithDeleted: [Product!]!
   fetchProduct(productId: String!): Product!
-  fetchProducts: [Product!]!
+  fetchProducts(search: String!): [Product!]!
 }
 
 type Mutation {
@@ -85,6 +85,7 @@ type Mutation {
   cancelPayment(impUid: String!, productId: String!): Payment!
   login(userNumber: String!, password: String!): String!
   restoreAccessToken: String!
+  logout: String!
   createUser(userInput: UserInput!): User!
   deleteUser(userId: String!): Boolean!
   updateUser(userId: String!, updateUserInput: UpdateUserInput!): User!

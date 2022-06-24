@@ -40,4 +40,11 @@ export class AuthResolver {
 
     return this.authService.generateToken({ userFound: targetUser });
   }
+
+  @Mutation(()=>String)
+  logout(
+    @Context() context: any
+  ) {
+    return this.authService.logoutUser({ context })
+  }
 }

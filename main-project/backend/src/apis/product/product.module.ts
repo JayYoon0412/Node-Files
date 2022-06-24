@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Category } from '../category/entities/category.entity';
 import { Image } from '../image/entities/image.entity';
@@ -12,6 +13,7 @@ import { ProductService } from './product.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Product, User, Payment, Category, Image]),
+    ElasticsearchModule.register({node: "http://elasticsearch:9200"})
   ],
   providers: [ProductResolver, ProductService, ImageService],
 })

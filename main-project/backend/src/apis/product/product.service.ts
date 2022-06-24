@@ -1,12 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Category } from '../category/entities/category.entity';
 import { Image } from '../image/entities/image.entity';
 import { ImageService } from '../image/image.service';
-import { Payment } from '../payment/entities/payment.entity';
 import { User } from '../users/entities/user.entity';
 import { Product } from './entities/product.entity';
+import { Cache } from 'cache-manager';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
 
 @Injectable()
 export class ProductService {
@@ -15,13 +16,14 @@ export class ProductService {
     private readonly productRepository: Repository<Product>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @InjectRepository(Payment)
-    private readonly paymentRepository: Repository<Payment>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
     @InjectRepository(Image)
     private readonly imageRepository: Repository<Image>,
     private readonly imageService: ImageService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
+    private readonly elasticsearchService: ElasticsearchService
   ) {}
 
   async create({ createProductInput }) {
@@ -99,11 +101,33 @@ export class ProductService {
     return result.affected ? true : false;
   }
 
-  async findAll() {
-    const products = await this.productRepository.find({
-      relations: ['user', 'payment', 'categories'],
-    });
-    return products;
+  async findAll({ search }) {
+    let searchResults : any = await this.cacheManager.get(search);
+    let results = [];
+    if (!searchResults) {
+      let idList = await this.elasticsearchService.search({
+        index: "myproducts",
+        query: {
+          match: { "name": search }
+        },
+        fields: ["id", "name", "description"]
+      })
+      for (let hit of idList.hits.hits) results.push(hit.fields.id[0])
+      searchResults = await Promise.all(
+        results.map((element)=> {
+          return this.productRepository.findOne({
+            where: { id: element },
+            relations: ['user', 'payment', 'categories']})
+        })
+      )
+      await this.cacheManager.set(search, searchResults, {
+        ttl: 1200
+      })
+      console.log("Cache Miss!")
+      return searchResults;
+    }
+    console.log("Cache Hit!")
+    return searchResults;
   }
 
   async findOne({ productId }) {

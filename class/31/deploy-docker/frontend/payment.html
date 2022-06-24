@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transaction Page</title>
+    <script
+      type="text/javascript"
+      src="https://code.jquery.com/jquery-1.12.4.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/axios/dist/axios.min.js"
+    ></script>
+
+    <script>
+      function requestPayment() {
+        const amount = document.getElementById("transaction-amount").value;
+
+        const IMP = window.IMP; // 생략 가능
+        IMP.init("imp01312583"); // Example: imp00000000
+
+        IMP.request_pay(
+          {
+            // 결제하는 정보
+            pg: "html5_inicis",
+            pay_method: "card", // Example: 무통장 입금이면 vbank
+            //merchant_uid: "ORD20180131-0000011", 주의: 중복되면 에러
+            name: "노르웨이 회전 의자",
+            amount: amount,
+            buyer_email: "gildong@gmail.com",
+            buyer_name: "홍길동",
+            buyer_tel: "010-4242-4242",
+            buyer_addr: "서울특별시 강남구 신사동",
+            buyer_postcode: "01181",
+          },
+          async function (rsp) {
+            // callback 콜백함수
+            if (rsp.success) {
+              alert("결제에 성공하였습니다."); //결제성공
+              console.log(rsp);
+
+              //1. endpoint단일화 2. 한번의 요청으로 여러개의 API실행가능 3. 응답내용 골라서 받기 가능 (네트워크 비용 효율적)
+              const data = await axios.post(
+                "http://localhost:3000/graphql",
+                {
+                  query: `mutation {
+                        createPointTransaction(
+                            impUid: "${rsp.imp_uid}",
+                            amount: ${rsp.paid_amount}
+                        ) {
+                            id
+                        }
+                    }`,
+                },
+                {
+                  headers: {
+                    authorization: "",
+                  },
+                }
+              );
+              console.log(data);
+            } else {
+              console.log(rsp);
+              alert("결제에 실패하였습니다."); //결제실패
+            }
+          }
+        );
+      }
+    </script>
+  </head>
+  <body>
+    결제 금액: <input type="text" id="transaction-amount" />
+    <button onclick="requestPayment()">결제하기</button>
+  </body>
+</html>

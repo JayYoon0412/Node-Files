@@ -46,7 +46,9 @@ export class ProductResolver {
   }
 
   @Query(() => [Product])
-  fetchProducts() {
-    return this.productService.findAll();
+  fetchProducts(
+    @Args('search') search: string
+  ) {
+    return this.productService.findAll({ search });
   }
 }

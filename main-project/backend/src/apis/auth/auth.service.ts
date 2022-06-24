@@ -1,12 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../users/user.service';
+import { Cache } from 'cache-manager';
+import * as jwt from 'jsonwebtoken';
+
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache
   ) {}
 
   generateToken({ userFound: user }) {
@@ -43,5 +48,39 @@ export class AuthService {
       'http://localhost:5500/main-project/frontend/login/index.html',
     );
     return await this.generateToken({ userFound });
+  }
+
+  async logoutUser({ context }) {
+    let accessToken = context.res.req.headers.authorization.split(" ")[1];
+    let refreshToken = context.req.headers.cookie.replace("refreshToken=", "");
+    
+    let accessExp = this.checkAccessToken({ accessToken });
+    let refreshExp = this.checkRefreshToken({ refreshToken });
+
+    await this.cacheManager.set(`accessToken:${accessToken}`, accessToken, {
+      ttl: accessExp
+    })
+    await this.cacheManager.set(`refreshToken:${refreshToken}`, refreshToken, {
+      ttl: refreshExp
+    })
+    return "로그아웃에 성공했습니다";
+  }
+
+  checkAccessToken({ accessToken }) {
+    try {
+      let decoded: any = jwt.verify(accessToken, 'accessKey')
+      return decoded.exp;
+    } catch(error) {
+      throw new UnauthorizedException("Error 401: Invalid Access Token")
+    }
+  }
+
+  checkRefreshToken({ refreshToken }) {
+    try {
+      let decoded: any = jwt.verify(refreshToken, 'refreshKey')
+      return decoded.exp;
+    } catch(error) {
+      throw new UnauthorizedException("Error 401: Invalid Refresh Token")
+    }
   }
 }
