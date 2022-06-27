@@ -29,7 +29,7 @@ import { FileModule } from './apis/file/file.module';
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: '34.64.33.146',
+      host: '10.120.96.3',
       port: 3306,
       username: 'root',
       password: 'root',
