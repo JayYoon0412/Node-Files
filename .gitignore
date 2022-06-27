@@ -1,5 +1,5 @@
 node_modules
-.env
+.env*
 gcp-bigquery.json
 gcp-key-file.json
 gcp-file-storage.json

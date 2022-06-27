@@ -29,11 +29,11 @@ import { FileModule } from './apis/file/file.module';
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'database',
+      host: '34.64.33.146',
       port: 3306,
       username: 'root',
       password: 'root',
-      database: 'mydocker03',
+      database: 'myserver03',
       entities: [__dirname + '/apis/**/*.entity.*'], // **는 폴더안의 폴더까지 모두 다 들어간다. 그리고 entity.ts로 끝나는 모든 파일들
       synchronize: true,
       logging: true,
